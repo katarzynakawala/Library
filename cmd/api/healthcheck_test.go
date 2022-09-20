@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"io"
 	"log"
 	"net/http"
@@ -42,7 +41,6 @@ func Test_application_healthcheckHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	bytes.TrimSpace(body)
 
 	assert.Contains(t, string(body),"status: available")
 	assert.Contains(t, string(body),"environment: development")
