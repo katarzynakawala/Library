@@ -2,26 +2,15 @@ package main
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_application_healthcheckHandler(t *testing.T) {
-	var cfg config
-	cfg.port = 8080
-	cfg.env = "development"
-
-	logger := log.New(os.Stdout, "", log.Ldate | log.Ltime)
-
-	app := &application{
-		config: cfg,
-		logger: logger,
-	}
+	app := applicationInstance(8080, "development")
 
 	rr := httptest.NewRecorder()
 
@@ -34,7 +23,7 @@ func Test_application_healthcheckHandler(t *testing.T) {
 
 	rs := rr.Result()
 
-	assert.Equal(t, rs.StatusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, rs.StatusCode)
 
 	defer rs.Body.Close()
 	body, err := io.ReadAll(rs.Body)
