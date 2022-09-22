@@ -31,7 +31,8 @@ func Test_application_healthcheckHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := "{\"environment\":\"development\",\"status\":\"available\",\"version\":\"1.0.0\"}\n"
 	assert.Equal(t, rs.Header.Get("Content-Type"), "application/json")
-	assert.Equal(t, expected, string(body))
+	assert.Contains(t, string(body), "available")
+	assert.Contains(t, string(body), "development")
+	assert.Contains(t, string(body), "1.0.0")
 }
