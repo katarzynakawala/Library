@@ -15,7 +15,7 @@ func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request
 func (app *application) showBookHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil || id < 1 {
-		http.NotFound(w, r)
+		app.notFoundResponse(w, r)
 		return
 	}
 
@@ -31,7 +31,6 @@ func (app *application) showBookHandler(w http.ResponseWriter, r *http.Request) 
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"book": book}, nil)
 	if err != nil {
-		app.logger.Print(err)
-		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		app.serverErrorResponse(w, r, err)
 	}
 }

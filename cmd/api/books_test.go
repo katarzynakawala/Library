@@ -31,7 +31,7 @@ func Test_application_showBookHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Contains(t, string(body), "404 page not found\n")
+	assert.Contains(t, string(body), "the requested resource could not be found")
 }
 
 func Test_application_createBookHandler(t *testing.T) {
