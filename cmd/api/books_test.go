@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -39,7 +40,10 @@ func Test_application_createBookHandler(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	r, err := http.NewRequest(http.MethodPost, "/v1/books", nil)
+	requestBody := "{\"title\":\"book\",\"author\":\"author\",\"year\":2016,\"pages\":107, \"genres\":[\"animation\",\"adventure\"]}"
+	reader := strings.NewReader(requestBody)
+
+	r, err := http.NewRequest(http.MethodPost, "/v1/books", reader)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,5 +60,5 @@ func Test_application_createBookHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Contains(t, string(body), "create a new book\n")
+	assert.Equal(t, string(body), "{Title:book Author:author Year:2016 Pages:107 Genres:[animation adventure]}\n")
 }
