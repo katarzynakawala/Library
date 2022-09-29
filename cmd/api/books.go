@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/katarzynakawala/Library/internal/data"
+	"github.com/katarzynakawala/Library/internal/validator"
 )
 
 func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +22,21 @@ func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request
 	err := app.readJSON(w, r, &input)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	book := &data.Book{
+		Title: input.Title,
+		Author: input.Author,
+		Year: input.Year,
+		Pages: input.Pages, 
+		Genres: input.Genres,
+	}
+
+	v := validator.New()
+
+	if data.ValidateBook(v, book); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 
