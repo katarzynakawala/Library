@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/katarzynakawala/Library/internal/validator"
+	"github.com/lib/pq"
 )
 
 type Book struct {
@@ -43,7 +44,14 @@ type BookModel struct {
 }
 
 func (b BookModel) Insert(book *Book) error {
-	return nil
+	query := `
+		INSERT INTO books (title, author, year, pages, genres)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, created_at, version`
+	
+	args := []any{book.Title, book.Author, book.Year, book.Pages, pq.Array(book.Genres)}
+	
+	return b.DB.QueryRow(query, args...).Scan(&book.ID, &book.CreatedAt, &book.Version)
 }
 
 func (b BookModel) Get(id int64) (*Book, error) {
