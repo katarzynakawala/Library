@@ -1,9 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/katarzynakawala/Library/internal/data"
 	"github.com/katarzynakawala/Library/internal/validator"
@@ -62,14 +62,15 @@ func (app *application) showBookHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	book := data.Book{
-		ID:        id,
-		CreatedAt: time.Now(),
-		Title:     "Empuzjon",
-		Author:    "Olga Tokarczuk",
-		Pages:     400,
-		Genres:    []string{"fiction", "horror"},
-		Version:   1,
+	book, err := app.models.Books.Get(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)	
+		}
+		return
 	}
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"book": book}, nil)

@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/katarzynakawala/Library/internal/validator"
@@ -55,7 +56,38 @@ func (b BookModel) Insert(book *Book) error {
 }
 
 func (b BookModel) Get(id int64) (*Book, error) {
-	return nil, nil
+	if id < 1 {
+		return nil, ErrRecordNotFound
+	}
+
+	query := `
+		SELECT id, created_at, title, author, year, pages, genres, version
+		FROM books
+		WHERE id = $1`
+	
+	var book Book
+	
+	err := b.DB.QueryRow(query, id).Scan(
+		&book.ID,
+		&book.CreatedAt,
+		&book.Title,
+		&book.Author,
+		&book.Year,
+		&book.Pages,
+		pq.Array(&book.Genres),
+		&book.Version,
+	)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err	
+		}
+	}
+
+	return &book, nil
 }
 
 func (b BookModel) Update(book *Book) error {
