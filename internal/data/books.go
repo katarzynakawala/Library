@@ -91,7 +91,22 @@ func (b BookModel) Get(id int64) (*Book, error) {
 }
 
 func (b BookModel) Update(book *Book) error {
-	return nil
+	query := `
+		UPDATE books
+		SET title = $1, author = $2, year = $3, pages = $4, genres = $5, version = version + 1
+		WHERE id = $6
+		RETURNING version`
+	
+	args := []any{
+		book.Title,
+		book.Author,
+		book.Year,
+		book.Pages,
+		pq.Array(book.Genres),
+		book.ID,
+	}
+	
+	return b.DB.QueryRow(query, args...).Scan(&book.Version)
 }
 
 func (b BookModel) Delete(id int64) error {
