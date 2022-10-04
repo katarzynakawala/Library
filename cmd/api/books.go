@@ -98,10 +98,10 @@ func (app *application) updateBookHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	var input struct {
-		Title  string     `json:"title"`
-		Author string     `json:"author"`
-		Year   int32      `json:"year"`
-		Pages  data.Pages `json:"pages"`
+		Title  *string     `json:"title"`
+		Author *string     `json:"author"`
+		Year   *int32      `json:"year"`
+		Pages  *data.Pages `json:"pages"`
 		Genres []string   `json:"genres"`
 	}
 
@@ -111,11 +111,25 @@ func (app *application) updateBookHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	book.Title = input.Title
-	book.Author = input.Author
-	book.Year = input.Year
-	book.Pages = input.Pages
-	book.Genres = input.Genres
+	if input.Title != nil {
+		book.Title = *input.Title
+	}
+
+	if input.Author != nil {
+		book.Author = *input.Author
+	}
+
+	if input.Year != nil {
+		book.Year = *input.Year
+	}
+
+	if input.Pages != nil {
+		book.Pages = *input.Pages
+	}
+
+	if input.Genres != nil {
+		book.Genres = input.Genres
+	}
 
 	v := validator.New()
 
